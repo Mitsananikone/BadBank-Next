@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const dal = require('../dal.js');
+const dal = require('../../dal.js');
 
 // Post Method - Create user account
 router.post('/account/create/:name/:email/:password', async (req, res) => {
