@@ -1,59 +1,37 @@
-const express = require('express');
-const cors = require('cors');
-const dal = require('./dal');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Route, Routes, Link, HashRouter } from 'react-router-dom';
+import NavBar from '../components/navbar';
+import UserContext from '../components/context';
+import Home from './home';
+import CreateAccount from './createaccount';
+import Login from './login';
+import Deposit from './deposit';
+import Withdraw from './withdraw';
+import Balance from './balance';
+import AllData from './alldata';
 
-const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(cors());
+export default function Spa() {
+  return (
+    <HashRouter>
+      <NavBar />
+      <UserContext.Provider value={{ users: [{ name: 'Mit', email: 'Mitsananikone@gmail.com', password: 'secret', balance: 0 }] }}>
+      <Link to="/"></Link>
+        <div className="container" style={{ padding: '20px' }}>
+          <Routes>
+            <Route path="/" exact component={Home} />
+            <Route path="/CreateAccount" component={CreateAccount} />
+            <Route path="/login" component={Login} />
+            <Route path="/deposit" component={Deposit} />
+            <Route path="/withdraw" component={Withdraw} />
+            <Route path="/balance" component={Balance} />
+            <Route path="/alldata" component={AllData} />
+          </Routes>
+        </div>
+      </UserContext.Provider>
+    </HashRouter>
+  );
+}
 
-app.get('/account/create/:name/:email/:password', async (req, res) => {
-  const { name, email, password } = req.params;
-  try {
-    const user = await dal.create(name, email, password);
-    res.json(user);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Could not create user' });
-  }
-});
-
-app.get('/account/login/:email/:password', async (req, res) => {
-  const { email, password } = req.params;
-  try {
-    const user = await dal.findOne(email);
-    if (user && user.password === password) {
-      res.json(user);
-    } else {
-      res.status(401).json({ error: 'Incorrect email or password' });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Could not log in user' });
-  }
-});
-
-app.get('/account/all', async (req, res) => {
-  try {
-    const users = await dal.all();
-    res.json(users);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Could not retrieve users' });
-  }
-});
-
-app.get('/account/update/:email/:amount', async (req, res) => {
-  const { email, amount } = req.params;
-  try {
-    const updatedUser = await dal.update(email, Number(amount));
-    res.json(updatedUser);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Could not update user' });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+ReactDOM.render(<Spa />, document.getElementById('root'));
